@@ -1,7 +1,7 @@
 # webchain-miner
 
-webchain-miner is a high performance Webchain (WEB) CPU miner, with official support for Windows.
-Originally based on XMRig with changes that allows mining WEB.
+webchain-miner is a high performance Webchain (WEB) GPU miner, support for Windows.
+Originally based on XMRig with changes that allows mining WEB on AMD GPUs.
 
 #### Table of contents
 * [Features](#features)
@@ -20,7 +20,6 @@ Originally based on XMRig with changes that allows mining WEB.
 * Support for backup (failover) mining server.
 * keepalived support.
 * Command line options compatible with XMRig.
-* Smart automatic [CPU configuration](https://github.com/xmrig/xmrig/wiki/Threads).
 * It's open source software.
 
 ## Download
@@ -66,7 +65,6 @@ Also you can use configuration via config file, default **config.json**. You can
 ## Common Issues
 ### HUGE PAGES unavailable
 * Run webchain-miner as Administrator.
-* webchain-miner automatically enables SeLockMemoryPrivilege for current user, but reboot or sign out still required. [Manual instruction](https://msdn.microsoft.com/en-gb/library/ms190730.aspx).
 
 ## Other information
 * No HTTP support, only stratum protocol support.
@@ -77,8 +75,6 @@ Also you can use configuration via config file, default **config.json**. You can
 ### Maximum performance checklist
 * Idle operating system.
 * Do not exceed optimal thread count.
-* Try setup optimal cpu affinity.
-* Enable fast memory (Large/Huge pages).
 
 ## Contacts
-* support@webchain.network
+* curquhart90@gmail.com
