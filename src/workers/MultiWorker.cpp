@@ -55,7 +55,6 @@ template<size_t N>
 bool MultiWorker<N>::selfTest()
 {
     m_thread->fn(xmrig::VARIANT_0)(test_input, 76, m_hash, lyra2_ctx);
-
     if (memcmp(m_hash, test_output_v1, sizeof m_hash) == 0) {
         return true;
     }
@@ -70,7 +69,7 @@ void MultiWorker<N>::start()
     while (Workers::sequence() > 0) {
         if (Workers::isPaused()) {
             do {
-                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
             }
             while (Workers::isPaused());
 

@@ -21,7 +21,7 @@
  */
 #ifndef SPONGE_H_
 #define SPONGE_H_
-
+#include <stdlib.h>
 #include <stdint.h>
 
 struct LYRA2_ctx;
@@ -37,15 +37,15 @@ static const uint64_t blake2b_IV[8] =
 
 /* Blake2b's rotation */
 static __inline uint64_t rotr64(const uint64_t w, const unsigned c) {
-#ifdef _MSC_VER
+	//#ifdef _MSC_VER
 	return _rotr64(w, c);
-#else
-	return ( w >> c ) | ( w << ( 64 - c ) );
-#endif
+	//#else
+		//return ( w >> c ) | ( w << ( 64 - c ) );
+	//#endif
 }
 
 /* Blake2b's G function */
-#define G(r,i,a,b,c,d) do { \
+#define G(a,b,c,d) do { \
 	a = a + b; \
 	d = rotr64(d ^ a, 32); \
 	c = c + d; \
@@ -59,30 +59,24 @@ static __inline uint64_t rotr64(const uint64_t w, const unsigned c) {
 
 /*One Round of the Blake2b's compression function*/
 #define ROUND_LYRA(r) \
-	G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
-	G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
-	G(r,2,v[ 2],v[ 6],v[10],v[14]); \
-	G(r,3,v[ 3],v[ 7],v[11],v[15]); \
-	G(r,4,v[ 0],v[ 5],v[10],v[15]); \
-	G(r,5,v[ 1],v[ 6],v[11],v[12]); \
-	G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
-	G(r,7,v[ 3],v[ 4],v[ 9],v[14]);
+	G(v[ 0],v[ 4],v[ 8],v[12]); \
+	G(v[ 1],v[ 5],v[ 9],v[13]); \
+	G(v[ 2],v[ 6],v[10],v[14]); \
+	G(v[ 3],v[ 7],v[11],v[15]); \
+	G(v[ 0],v[ 5],v[10],v[15]); \
+	G(v[ 1],v[ 6],v[11],v[12]); \
+	G(v[ 2],v[ 7],v[ 8],v[13]); \
+	G(v[ 3],v[ 4],v[ 9],v[14]);
 
 #define ROUND_LYRA_PREFETCH(r) \
-	G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
-	G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
-	G(r,2,v[ 2],v[ 6],v[10],v[14]); \
-	G(r,3,v[ 3],v[ 7],v[11],v[15]); \
-	G(r,4,v[ 0],v[ 5],v[10],v[15]); \
-	{ \
-		const int64_t rowa = v[0] & (unsigned int)(NROWS-1); \
-		__builtin_prefetch((uint64_t*)(memMatrix(rowa)+0)); \
-		__builtin_prefetch((uint64_t*)(memMatrix(rowa)+4)); \
-		__builtin_prefetch((uint64_t*)(memMatrix(rowa)+8)); \
-	} \
-	G(r,5,v[ 1],v[ 6],v[11],v[12]); \
-	G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
-	G(r,7,v[ 3],v[ 4],v[ 9],v[14]);
+	G(v[ 0],v[ 4],v[ 8],v[12]); \
+	G(v[ 1],v[ 5],v[ 9],v[13]); \
+	G(v[ 2],v[ 6],v[10],v[14]); \
+	G(v[ 3],v[ 7],v[11],v[15]); \
+	G(v[ 0],v[ 5],v[10],v[15]); \
+	G(v[ 1],v[ 6],v[11],v[12]); \
+	G(v[ 2],v[ 7],v[ 8],v[13]); \
+	G(v[ 3],v[ 4],v[ 9],v[14]);
 
 //---- Housekeeping
 void initState(uint64_t state[/*16*/]);

@@ -61,12 +61,12 @@ int LYRA2(void *ctx2, void *K, int64_t kLen, const void *pwd, int32_t pwdlen)
 	//========== Initializing the Memory Matrix and pointers to it =============//
 	//Tries to allocate enough space for the whole memory matrix
 
-	const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * NCOLS;
-	const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
+	const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * NCOLS; // 12 * 4 = 48
+	const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8; // 48 * 8 = 384
 	// for Lyra2REv2, nCols = 4, v1 was using 8
-	const int64_t BLOCK_LEN = (NCOLS == 4) ? BLOCK_LEN_BLAKE2_SAFE_INT64 : BLOCK_LEN_BLAKE2_SAFE_BYTES;
+	const int64_t BLOCK_LEN = (NCOLS == 4) ? BLOCK_LEN_BLAKE2_SAFE_INT64 : BLOCK_LEN_BLAKE2_SAFE_BYTES; // 12
 
-	size_t sz = (size_t)ROW_LEN_BYTES * NROWS;
+	size_t sz = (size_t)ROW_LEN_BYTES * NROWS; // 384 * 16384 = 6,291,456
 	memset(ctx->wholeMatrix, 0, sz);
 
 	//============= Getting the password + basil padded with 10*1 ===============//
@@ -74,7 +74,7 @@ int LYRA2(void *ctx2, void *K, int64_t kLen, const void *pwd, int32_t pwdlen)
 	//but this ensures that the password copied locally will be overwritten as soon as possible
 
 	//First, we clean enough blocks for the password, basil and padding
-	int64_t nBlocksInput = ((pwdlen + 6 * sizeof(uint64_t)) / BLOCK_LEN_BLAKE2_SAFE_BYTES) + 1;
+	int64_t nBlocksInput = ((pwdlen + 6 * sizeof(uint64_t)) / BLOCK_LEN_BLAKE2_SAFE_BYTES) + 1; //
 
 	byte *ptrByte = (byte*) ctx->wholeMatrix;
 
@@ -161,9 +161,9 @@ int LYRA2(void *ctx2, void *K, int64_t kLen, const void *pwd, int32_t pwdlen)
 			rowa = state[0] & (unsigned int)(NROWS-1);  //(USE THIS IF NROWS IS A POWER OF 2)
 			//rowa = state[0] % NROWS; //(USE THIS FOR THE "GENERIC" CASE)
 			//------------------------------------------------------------------------------------------
-			__builtin_prefetch((uint64_t*)(memMatrix(rowa))+0);
-			__builtin_prefetch((uint64_t*)(memMatrix(rowa))+4);
-			__builtin_prefetch((uint64_t*)(memMatrix(rowa))+8);
+			//__builtin_prefetch((uint64_t*)(memMatrix(rowa))+0);
+			//__builtin_prefetch((uint64_t*)(memMatrix(rowa))+4);
+			//__builtin_prefetch((uint64_t*)(memMatrix(rowa))+8);
 
 			//Performs a reduced-round duplexing operation over M[row*] XOR M[prev], updating both M[row*] and M[row]
 			reducedDuplexRow(state, memMatrix(prev), memMatrix(rowa), memMatrix(row), ctx);
@@ -177,9 +177,9 @@ int LYRA2(void *ctx2, void *K, int64_t kLen, const void *pwd, int32_t pwdlen)
 			//row = (row + step) % NROWS; //(USE THIS FOR THE "GENERIC" CASE)
 			//------------------------------------------------------------------------------------------
 			int64_t nrow = (row + step) & (unsigned int)(NROWS-1); //(USE THIS IF NROWS IS A POWER OF 2)
-			__builtin_prefetch((uint64_t*)(memMatrix(nrow))+0);
-			__builtin_prefetch((uint64_t*)(memMatrix(nrow))+4);
-			__builtin_prefetch((uint64_t*)(memMatrix(nrow))+8);
+			//__builtin_prefetch((uint64_t*)(memMatrix(nrow))+0);
+			//__builtin_prefetch((uint64_t*)(memMatrix(nrow))+4);
+			//__builtin_prefetch((uint64_t*)(memMatrix(nrow))+8);
 
 		} while (row != 0);
 	}
@@ -198,10 +198,10 @@ void *LYRA2_create(void)
 {
 	struct LYRA2_ctx *ctx = malloc(sizeof(struct LYRA2_ctx));
 
-	const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * NCOLS;
-	const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8;
+	const int64_t ROW_LEN_INT64 = BLOCK_LEN_INT64 * NCOLS; //48
+	const int64_t ROW_LEN_BYTES = ROW_LEN_INT64 * 8; //48 * 8 = 384
 
-	size_t sz = (size_t)ROW_LEN_BYTES * NROWS;
+	size_t sz = (size_t)ROW_LEN_BYTES * NROWS; // 789,432
 	ctx->wholeMatrix = malloc(sz);
 	if (ctx->wholeMatrix == NULL) {
 		free(ctx);
